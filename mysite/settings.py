@@ -116,3 +116,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/dev/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# Use '*' only for testing; in production, use your EC2 Public IP or Domain
+ALLOWED_HOSTS = ['*'] 
