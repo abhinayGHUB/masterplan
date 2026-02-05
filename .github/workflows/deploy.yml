@@ -1,0 +1,29 @@
+name: Deploy Django to EC2
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            if [ ! -d "django-app" ]; then
+              git clone https://github.com{{ github.repository }}.git django-app
+            fi
+            cd django-app
+            git pull origin main
+            sudo docker stop django-app || true
+            sudo docker rm django-app || true
+            sudo docker build -t django-app .
+            sudo docker run -d -p 8000:8000 --name django-app --restart unless-stopped django-app
+            sudo docker image prune -f
