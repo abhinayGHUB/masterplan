@@ -18,20 +18,13 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            set -e
-            # 1. Clean up old code and containers
-            sudo rm -rf ~/masterplandjango
+            sudo rm -rf /home/ubuntu/masterplandjango
             sudo docker stop django-app || true
             sudo docker rm django-app || true
             
-            # 2. Corrected Git Clone (Fixed the URL slash)
-            git clone --depth 1 https://github.com{{ github.repository }}.git ~/masterplandjango
+            # Hardcoded URL to stop the "Too many arguments" error once and for all
+            git clone --depth 1 https://github.com /home/ubuntu/masterplandjango
             
-            # 3. Build and Run from the new folder
-            cd ~/masterplandjango
+            cd /home/ubuntu/masterplandjango
             sudo docker build --no-cache -t django-app .
             sudo docker run -d -p 80:8000 --name django-app --restart unless-stopped django-app
-            
-            # 4. Final verification logs
-            sudo docker ps
-            sudo docker logs --tail 10 django-app
