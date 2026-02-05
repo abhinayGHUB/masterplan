@@ -19,7 +19,6 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             if [ ! -d "masterplandjango" ]; then
-              # FIX: Added the slash and correct variable syntax
               git clone https://github.com{{ github.repository }}.git masterplandjango
             fi
             cd masterplandjango
