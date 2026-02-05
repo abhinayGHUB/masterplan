@@ -18,13 +18,10 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            sudo rm -rf /home/ubuntu/masterplandjango
+            # 1. Clean up old data and stop existing containers
+            sudo rm -rf ~/masterplandjango
             sudo docker stop django-app || true
             sudo docker rm django-app || true
             
-            # Hardcoded URL to stop the "Too many arguments" error once and for all
-            git clone --depth 1 https://github.com /home/ubuntu/masterplandjango
-            
-            cd /home/ubuntu/masterplandjango
-            sudo docker build --no-cache -t django-app .
-            sudo docker run -d -p 80:8000 --name django-app --restart unless-stopped django-app
+            # 2. Fixed Clone: Added the '/' to fix the URL syntax error
+            git clone --depth 1 
