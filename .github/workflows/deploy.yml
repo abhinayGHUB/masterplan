@@ -18,13 +18,20 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            if [ ! -d "masterplandjango" ]; then
-              git clone https://github.com{{ github.repository }}.git masterplandjango
-            fi
-            cd masterplandjango
-            git pull origin main
+            set -e
+            # 1. Clean up old code and containers
+            sudo rm -rf ~/masterplandjango
             sudo docker stop django-app || true
             sudo docker rm django-app || true
-            sudo docker build -t django-app .
-            sudo docker run -d -p 8000:8000 --name django-app --restart unless-stopped django-app
-            sudo docker image prune -f
+            
+            # 2. Corrected Git Clone (Fixed the URL slash)
+            git clone --depth 1 https://github.com{{ github.repository }}.git ~/masterplandjango
+            
+            # 3. Build and Run from the new folder
+            cd ~/masterplandjango
+            sudo docker build --no-cache -t django-app .
+            sudo docker run -d -p 80:8000 --name django-app --restart unless-stopped django-app
+            
+            # 4. Final verification logs
+            sudo docker ps
+            sudo docker logs --tail 10 django-app
